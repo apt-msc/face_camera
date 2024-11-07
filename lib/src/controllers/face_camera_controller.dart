@@ -93,20 +93,22 @@ class FaceCameraController extends ValueNotifier<FaceCameraState> {
 
       await changeFlashMode(value.availableFlashMode.indexOf(defaultFlashMode));
 
-      await cameraController.lockCaptureOrientation(EnumHandler.cameraOrientationToDeviceOrientation(orientation));
+      if (orientation != null) {
+        await cameraController.lockCaptureOrientation(EnumHandler.cameraOrientationToDeviceOrientation(orientation)!);
+      }
     }
 
     startImageStream();
   }
 
   Future<void> changeOrientation(CameraOrientation? newOrientation) async {
-    print(value.cameraController);
-
     if (value.cameraController == null) {
       return;
     }
-    await value.cameraController!
-        .lockCaptureOrientation(EnumHandler.cameraOrientationToDeviceOrientation(newOrientation));
+    if (newOrientation != null) {
+      await value.cameraController!
+          .lockCaptureOrientation(EnumHandler.cameraOrientationToDeviceOrientation(newOrientation)!);
+    }
   }
 
   Future<void> changeFlashMode([int? index]) async {
