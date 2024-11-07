@@ -100,6 +100,11 @@ class FaceCameraController extends ValueNotifier<FaceCameraState> {
   }
 
   Future<void> changeOrientation(CameraOrientation? newOrientation) async {
+    print(value.cameraController);
+
+    if (value.cameraController == null) {
+      return;
+    }
     await value.cameraController!
         .lockCaptureOrientation(EnumHandler.cameraOrientationToDeviceOrientation(newOrientation));
   }
