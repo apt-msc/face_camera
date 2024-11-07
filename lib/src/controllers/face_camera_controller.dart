@@ -99,6 +99,11 @@ class FaceCameraController extends ValueNotifier<FaceCameraState> {
     startImageStream();
   }
 
+  Future<void> changeOrientation(CameraOrientation? newOrientation) async {
+    await value.cameraController!
+        .lockCaptureOrientation(EnumHandler.cameraOrientationToDeviceOrientation(newOrientation));
+  }
+
   Future<void> changeFlashMode([int? index]) async {
     final newIndex = index ?? (value.currentFlashMode + 1) % value.availableFlashMode.length;
     await value.cameraController!
