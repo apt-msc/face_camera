@@ -83,9 +83,11 @@ class FaceCameraController extends ValueNotifier<FaceCameraState> {
 
     if (cameras.isNotEmpty) {
       final cameraController = CameraController(
-          cameras.first, EnumHandler.imageResolutionToResolutionPreset(imageResolution),
-          enableAudio: enableAudio,
-          imageFormatGroup: Platform.isAndroid ? ImageFormatGroup.nv21 : ImageFormatGroup.bgra8888);
+        cameras.first,
+        EnumHandler.imageResolutionToResolutionPreset(imageResolution),
+        enableAudio: enableAudio,
+        imageFormatGroup: Platform.isAndroid ? ImageFormatGroup.nv21 : ImageFormatGroup.bgra8888,
+      );
 
       await cameraController.initialize().whenComplete(() {
         value = value.copyWith(isInitialized: true, cameraController: cameraController);
@@ -93,22 +95,10 @@ class FaceCameraController extends ValueNotifier<FaceCameraState> {
 
       await changeFlashMode(value.availableFlashMode.indexOf(defaultFlashMode));
 
-      if (orientation != null) {
-        await cameraController.lockCaptureOrientation(EnumHandler.cameraOrientationToDeviceOrientation(orientation)!);
-      }
+      // await cameraController.lockCaptureOrientation(EnumHandler.cameraOrientationToDeviceOrientation(orientation));
     }
 
     startImageStream();
-  }
-
-  Future<void> changeOrientation(CameraOrientation? newOrientation) async {
-    if (value.cameraController == null) {
-      return;
-    }
-    if (newOrientation != null) {
-      await value.cameraController!
-          .lockCaptureOrientation(EnumHandler.cameraOrientationToDeviceOrientation(newOrientation)!);
-    }
   }
 
   Future<void> changeFlashMode([int? index]) async {
