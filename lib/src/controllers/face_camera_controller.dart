@@ -19,7 +19,7 @@ class FaceCameraController extends ValueNotifier<FaceCameraState> {
     this.defaultFlashMode = CameraFlashMode.auto,
     this.enableAudio = true,
     this.autoCapture = false,
-    this.orientation = CameraOrientation.portraitUp,
+    this.orientation,
     this.performanceMode = FaceDetectorMode.fast,
     required this.onCapture,
     this.onFaceDetected,
@@ -83,16 +83,16 @@ class FaceCameraController extends ValueNotifier<FaceCameraState> {
 
     if (cameras.isNotEmpty) {
       final cameraController = CameraController(
-          cameras.first, EnumHandler.imageResolutionToResolutionPreset(imageResolution),
-          enableAudio: enableAudio,
-          imageFormatGroup: Platform.isAndroid ? ImageFormatGroup.nv21 : ImageFormatGroup.bgra8888);
-
+        cameras.first,
+        EnumHandler.imageResolutionToResolutionPreset(imageResolution),
+        enableAudio: enableAudio,
+        imageFormatGroup: Platform.isAndroid ? ImageFormatGroup.nv21 : ImageFormatGroup.bgra8888,
+      );
+      await cameraController.unlockCaptureOrientation();
       await cameraController.initialize().whenComplete(() {
         value = value.copyWith(isInitialized: true, cameraController: cameraController);
       });
-
       await changeFlashMode(value.availableFlashMode.indexOf(defaultFlashMode));
-
       await cameraController.lockCaptureOrientation(EnumHandler.cameraOrientationToDeviceOrientation(orientation));
     }
 
