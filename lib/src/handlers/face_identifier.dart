@@ -22,8 +22,7 @@ class FaceIdentifier {
     DetectedFace? result;
     final face = await _detectFace(
         performanceMode: performanceMode,
-        visionImage:
-            _inputImageFromCameraImage(cameraImage, controller, orientations));
+        visionImage: _inputImageFromCameraImage(cameraImage, controller, orientations));
     if (face != null) {
       result = face;
     }
@@ -31,8 +30,8 @@ class FaceIdentifier {
     return result;
   }
 
-  static InputImage? _inputImageFromCameraImage(CameraImage image,
-      CameraController? controller, Map<DeviceOrientation, int> orientations) {
+  static InputImage? _inputImageFromCameraImage(
+      CameraImage image, CameraController? controller, Map<DeviceOrientation, int> orientations) {
     // get image rotation
     // it is used in android to convert the InputImage from Dart to Java
     // `rotation` is not used in iOS to convert the InputImage from Dart to Obj-C
@@ -43,16 +42,14 @@ class FaceIdentifier {
     if (Platform.isIOS) {
       rotation = InputImageRotationValue.fromRawValue(sensorOrientation);
     } else if (Platform.isAndroid) {
-      var rotationCompensation =
-          orientations[controller.value.deviceOrientation];
+      var rotationCompensation = orientations[controller.value.deviceOrientation];
       if (rotationCompensation == null) return null;
       if (camera.lensDirection == CameraLensDirection.front) {
         // front-facing
         rotationCompensation = (sensorOrientation + rotationCompensation) % 360;
       } else {
         // back-facing
-        rotationCompensation =
-            (sensorOrientation - rotationCompensation + 360) % 360;
+        rotationCompensation = (sensorOrientation - rotationCompensation + 360) % 360;
       }
       rotation = InputImageRotationValue.fromRawValue(rotationCompensation);
     }
@@ -63,17 +60,13 @@ class FaceIdentifier {
     // validate format depending on platform
     // only supported formats:
     // * bgra8888 for iOS
-    if (format == null ||
-        (Platform.isIOS && format != InputImageFormat.bgra8888)) return null;
+    if (format == null || (Platform.isIOS && format != InputImageFormat.bgra8888)) return null;
     if (image.planes.isEmpty) return null;
 
     final bytes = Platform.isAndroid
         ? image.getNv21Uint8List()
         : Uint8List.fromList(
-            image.planes.fold(
-                <int>[],
-                (List<int> previousValue, element) =>
-                    previousValue..addAll(element.bytes)),
+            image.planes.fold(<int>[], (List<int> previousValue, element) => previousValue..addAll(element.bytes)),
           );
 
     // compose InputImage using bytes
@@ -89,13 +82,14 @@ class FaceIdentifier {
   }
 
   static Future<DetectedFace?> _detectFace(
-      {required InputImage? visionImage,
-      required FaceDetectorMode performanceMode}) async {
+      {required InputImage? visionImage, required FaceDetectorMode performanceMode}) async {
     if (visionImage == null) return null;
     final options = FaceDetectorOptions(
-        enableLandmarks: true,
-        enableTracking: true,
-        performanceMode: performanceMode);
+      enableClassification: true,
+      enableLandmarks: true,
+      enableTracking: true,
+      performanceMode: performanceMode,
+    );
     final faceDetector = FaceDetector(options: options);
     try {
       final List<Face> faces = await faceDetector.processImage(visionImage);
@@ -130,12 +124,9 @@ class FaceIdentifier {
       // eyes, cheeks, and nose available):
       final FaceLandmark? leftEar = face.landmarks[FaceLandmarkType.leftEar];
       final FaceLandmark? rightEar = face.landmarks[FaceLandmarkType.rightEar];
-      final FaceLandmark? bottomMouth =
-          face.landmarks[FaceLandmarkType.bottomMouth];
-      final FaceLandmark? rightMouth =
-          face.landmarks[FaceLandmarkType.rightMouth];
-      final FaceLandmark? leftMouth =
-          face.landmarks[FaceLandmarkType.leftMouth];
+      final FaceLandmark? bottomMouth = face.landmarks[FaceLandmarkType.bottomMouth];
+      final FaceLandmark? rightMouth = face.landmarks[FaceLandmarkType.rightMouth];
+      final FaceLandmark? leftMouth = face.landmarks[FaceLandmarkType.leftMouth];
       final FaceLandmark? noseBase = face.landmarks[FaceLandmarkType.noseBase];
       if (leftEar == null ||
           rightEar == null ||
